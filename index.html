@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" lang="en">
+
+        <meta property="og:site_name" content="Urgent">
+        <meta property="og:title" content="Urgent" />
+        <meta property="og:description" content="Urgent" />
+        <meta property="og:locale" content="en_US" />
+        <meta property="og:type" content="website" />
+
+        <title>Wildsea focus tracker</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+        <link rel="icon" type="image/png" href="img/favicon.png" sizes="512x512">
+    </head>
+    <style>
+      :root {
+  --text-h: #fff;
+  --text-m: #f2f4f8;
+  --text-l: #dde1e6;
+  --border:#f2f4f8;
+  
+  
+  --blue:#6a98b9;
+  --blue-dark:#2d5c7b;
+  --green:#6b7c53;
+  --red:#ad4b51;
+  --red-dark:#92362e;
+  --yellow:#e2af56;
+  --purple:#9f608b;
+  --black:#111111;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html {
+    font-size: 110%;
+  background:var(--text-l);
+} 
+body {
+  margin:0;
+}
+.main {
+  display: flex;
+  flex-flow: row wrap;
+  font-size:2em;
+  font-family: "Teko", sans-serif;
+  font-optical-sizing: auto;
+    flex-direction:column;
+  margin:1rem;
+  height:100%;
+
+}
+.row {
+  flex: 1 100%;
+  display: flex;
+  flex-direction:row;
+  text-align:center;
+  align-items: center;
+  height:4rem;
+  align-items: stretch;
+    border-bottom:2px solid var(--border);
+  border-left:2px solid var(--border);
+  border-right:2px solid var(--border);
+    border-radius:8px;
+}
+
+.header {
+  background-color:var(--blue-dark);
+  color:var(--text-h);
+  font-weight:600;
+    border-radius:8px;
+  
+  
+}
+
+.focus.header {
+   padding:1rem;
+    border-radius:0 8px 8px 0;  
+}
+.title.header {
+     padding:1rem;
+      border-radius:8px 0  0 8px;  
+}
+
+.title {
+  
+  width:300px;
+  display:flex;
+   letter-spacing: 0.05rem;
+    border-radius:8px;
+    flex-direction:row;
+}
+.title.user{
+      padding:1rem 1rem 0.5rem  1rem ;
+    background-color:var(--red-dark);
+}
+
+.title .name {
+  display:flex;
+  flex-direction:column;
+  font-style: normal;
+  flex-grow:1;
+  width:80%;
+
+}
+
+.name .p-name  {
+  font-size:1rem !important;
+  font-weight: 400 !important;
+   color:var(--text-l) !important;
+}
+
+.name .pc-name {
+  color:var(--text-h) !important;
+  font-weight: 800 !important;
+  font-size:1.6rem !important;
+}
+
+.title .count {
+  color:var(--text-l) !important;
+  display:flex;
+  flex-direction:column;
+  font-size:1rem !important;
+}
+.title .count . action-count {
+   color:var(--text-h) !important;
+}
+
+.name>input[type=text] {
+  all: unset;
+  text-align:left;
+}
+.name>input[type=text]::-webkit-input-placeholder {
+  color:var(--text-l) !important;
+}
+
+.focus {
+  flex-grow:1;
+  display:flex;
+  flex-direction: row;
+  align-items: stretch;
+    font-weight:600;
+   border-left:2px solid var(--border);
+}
+
+.row.template {
+  display:none;
+}
+
+.focus-cell {
+  background-color:var(--yellow);
+  min-width:4rem;
+  flex:1;
+  border-right: 2px solid var(--text-l);
+  border-radius:8px;
+}
+
+.focus-cell:last-of-type {
+  border-right:none;
+}
+
+.focus-cell::after {
+  position:relative;
+  top:1.4rem;
+  content: "A/R";
+  align-items: center;
+  color:var(--text-l);
+}
+
+
+.action {
+  background-color:var(--red);
+}  
+.focus-cell.action::after {
+  color:#f5f5f5;
+  content: "A";
+}
+
+.reaction {
+  background-color:var(--purple);
+}  
+.focus-cell.reaction::after {
+  color:#f5f5f5;
+  content: "R";
+}
+
+.btn-bottom {
+  position:fixed;
+  bottom:0;
+  display:flex;
+  flex-direction: row;
+  background-color: var(--text-h);
+  padding:8px;
+
+}
+
+.btn-bottom .btn {
+  height:40px;
+  background-color:var(--black);
+  color:var(--yellow);
+  justify-content:space-between;
+  line-height: 36px !important;
+  display: inline-block !important;
+  padding: 2px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  vertical-align: middle;
+  border: 0 none #fff !important;
+  text-decoration: none;
+  text-shadow: none;
+  font-weight: 500 !important;
+  font-size: 16px !important;
+  letter-spacing: 0.5px;
+  font-family: "Teko", sans-serif;
+}
+.left{
+  left:0;
+  border-radius:0 8px 0 0;
+}
+.right {
+  right:0;
+  border-radius:8px 0 0 0;
+}
+
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+}
+main {
+  margin-bottom:80px;
+}
+    </style>
+    <body >
+      <html lang="en">
+
+      <head>
+        <style>
+          @import url('https://fonts.googleapis.com/css2?family=Teko:wght@300..700&display=swap');
+          @import url('https://fonts.googleapis.com/css2?family=Karma:wght@300;400;500;600;700&family=Neuton:ital,wght@0,200;0,300;0,400;0,700;0,800;1,400&display=swap');
+        </style>
+        <meta charset="UTF-8" />
+        <title>Wildsea focus tracker</title>
+      </head>
+      
+      <body>
+        <main class="main">
+          <h1>Focus tracker</h1>
+      
+          <div class="row header">
+            <div class="title  header">
+              Name
+            </div>
+            <div class="focus  header">
+              Focus
+      
+      
+            </div>
+          </div>
+      
+      
+              <div class="row template">
+            <div class="title user">
+              <div class="name">
+                <input class="p-name" type="text" placeholder="Player name">
+                <input class="pc-name" type="text" placeholder="Character name">
+              </div>
+              <div class="count"> 
+                  <div>A: <span class="action-count">0</span>
+                    
+                  </div>
+                <div>
+                          R: <span class="reaction-count">0</span>
+                </div>
+      
+              </div>
+      
+            </div>
+            <div class="focus tracker">
+              <div class="focus-cell"></div>
+              <div class="focus-cell"></div>
+              <div class="focus-cell"></div>
+              <div class="focus-cell"></div>
+              <div class="focus-cell"></div>
+              <div class="focus-cell"></div>
+              <div class="focus-cell"></div>
+              <div class="focus-cell"></div>
+            </div>
+          </div>
+                  <div class="row player">
+            <div class="title user">
+              <div class="name">
+                <input class="p-name" type="text" placeholder="Player name">
+                <input class="pc-name" type="text" placeholder="Character name">
+              </div>
+              <div class="count"> 
+                  <div>A: <span class="action-count">0</span>
+                    
+                  </div>
+                <div>
+                          R: <span class="reaction-count">0</span>
+                </div>
+      
+              </div>
+      
+            </div>
+            <div class="focus tracker">
+              <div class="focus-cell"></div>
+              <div class="focus-cell"></div>
+              <div class="focus-cell"></div>
+              <div class="focus-cell"></div>
+              <div class="focus-cell"></div>
+              <div class="focus-cell"></div>
+              <div class="focus-cell"></div>
+              <div class="focus-cell"></div>
+            </div>
+          </div>
+          <div class="player-anchor"></div>
+
+
+        </main>
+        <div class="btn-bottom left">      
+          <div> <button id="add-row-btn" class="btn">Add row</button>
+            <button id="remove-row-btn"  class="btn">Remove row</button>
+            <button id="add-cells-btn" class="btn">Add focus</button>
+          </div>    
+</div>
+<div class="btn-bottom right">      
+  <div>
+    
+  <script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script><script type='text/javascript'>kofiwidget2.init('Support Me on Ko-fi', '#29abe0', 'N4N210POEB');kofiwidget2.draw();</script>
+  </div>    
+</div>
+      </body>
+      
+      </html>
+
+    </body>
+    <script>
+ $(document).ready(function() {
+            function updateCounts(row) {
+                var actionCount = $(row).find('.focus-cell.action').length;
+                var reactionCount = $(row).find('.focus-cell.reaction').length;
+                $(row).find('.action-count').text(actionCount);
+                $(row).find('.reaction-count').text(reactionCount);
+            }
+
+            // Event delegation for dynamically added .focus-cell elements
+            $('.tracker').on('click', '.focus-cell', function() {
+                var row = $(this).closest('.row');
+                if ($(this).hasClass('action')) {
+                    $(this).removeClass('action').addClass('reaction');
+                } else if ($(this).hasClass('reaction')) {
+                    $(this).removeClass('reaction');
+                } else {
+                    // If it doesn't have either class, add the 'action' class
+                    $(this).addClass('action');
+                }
+                updateCounts(row);
+            });
+
+            $('#add-cells-btn').on('click', function() {
+                $('.tracker.focus').each(function() {
+                    $(this).append('<div class="focus-cell"></div>');
+                    updateCounts(this);
+                });
+            });
+            
+            // adding another row
+            $('#add-row-btn').on('click', function() {
+              $(".template").clone(true).insertAfter(".player-anchor").removeClass("template").addClass("player");
+            });
+
+            // removing
+              $('#remove-row-btn').on('click', function() {
+                console.log("trying to remove");
+              $(".row.player").last().remove();
+            });
+
+            // Initial count update
+            $('.row.focus').each(function() {
+                updateCounts(this);
+            });
+        });
+       
+    </script>
+</html>
